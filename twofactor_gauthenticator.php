@@ -28,7 +28,8 @@ class twofactor_gauthenticator extends rcube_plugin
         $rcmail = rcmail::get_instance();
 
         // Completely block AJAX requests for unauthenticated users (by Stephen K. Gielda <security@codamail.com>)
-        if (!$rcmail->user->ID && !isset($_SESSION['twofactor_gauthenticator_login']) && isset($_REQUEST['_remote'])) {
+        if (!$rcmail->user->ID && !isset($_SESSION['twofactor_gauthenticator_login']) && isset($_REQUEST['_remote']))
+        {
 
             // Direct JSON response to prevent leakage
             header('Content-Type: application/json');
@@ -40,28 +41,32 @@ class twofactor_gauthenticator extends rcube_plugin
         }
 
         // Block data access via AJAX for partially authenticated users who have 2FA enabled (by Stephen K. Gielda <security@codamail.com>)
-	if (isset($_SESSION['twofactor_gauthenticator_login']) && 
-	    (!isset($_SESSION['twofactor_gauthenticator_2FA_login']) || 
-	     $_SESSION['twofactor_gauthenticator_2FA_login'] < $_SESSION['twofactor_gauthenticator_login']) && 
-	    isset($_REQUEST['_remote']) &&
-	    $rcmail->action !== 'plugin.twofactor_gauthenticator-checkcode' &&
-	    $rcmail->task !== 'login') {
-	    
-	    // Get user's 2FA config
-	    $user_prefs = $rcmail->user->get_prefs();
-	    $tfa_config = isset($user_prefs['twofactor_gauthenticator']) ? $user_prefs['twofactor_gauthenticator'] : null;
-	    
-	    // Only block if 2FA is enabled for this user
-	    if ($tfa_config && isset($tfa_config['activate']) && $tfa_config['activate']) {
-		// Direct JSON response to prevent leakage
-		header('Content-Type: application/json');
-		echo json_encode(array(
-		    'error' => '2FA authentication required',
-		    'redirect' => '?_task=login&_err=session'
-		));
-		exit;
-	    }
-	}
+        if (
+            isset($_SESSION['twofactor_gauthenticator_login']) &&
+            (!isset($_SESSION['twofactor_gauthenticator_2FA_login']) ||
+                $_SESSION['twofactor_gauthenticator_2FA_login'] < $_SESSION['twofactor_gauthenticator_login']) &&
+            isset($_REQUEST['_remote']) &&
+            $rcmail->action !== 'plugin.twofactor_gauthenticator-checkcode' &&
+            $rcmail->task !== 'login'
+        )
+        {
+
+            // Get user's 2FA config
+            $user_prefs = $rcmail->user->get_prefs();
+            $tfa_config = isset($user_prefs['twofactor_gauthenticator']) ? $user_prefs['twofactor_gauthenticator'] : null;
+
+            // Only block if 2FA is enabled for this user
+            if ($tfa_config && isset($tfa_config['activate']) && $tfa_config['activate'])
+            {
+                // Direct JSON response to prevent leakage
+                header('Content-Type: application/json');
+                echo json_encode(array(
+                    'error' => '2FA authentication required',
+                    'redirect' => '?_task=login&_err=session'
+                ));
+                exit;
+            }
+        }
 
         // hooks
         $this->add_hook('login_after', array($this, 'login_after'));
@@ -73,7 +78,8 @@ class twofactor_gauthenticator extends rcube_plugin
         $allowedPlugin = $this->__pluginAllowedByConfig();
 
         // skipping all logic and plugin not appears
-        if (!$allowedPlugin) {
+        if (!$allowedPlugin)
+        {
             return false;
         }
 
@@ -107,12 +113,16 @@ class twofactor_gauthenticator extends rcube_plugin
         //	-- From config.inc.php file.
         //  -- You can use regexp: admin.*@domain.com
         $users = $rcmail->config->get('users_allowed_2FA');
-        if (is_array($users)) {		// exists "users" from config.inc.php
-            foreach ($users as $u) {
-                if (isset($rcmail->user->data['username'])) {
+        if (is_array($users))
+        {        // exists "users" from config.inc.php
+            foreach ($users as $u)
+            {
+                if (isset($rcmail->user->data['username']))
+                {
                     preg_match("/$u/", $rcmail->user->data['username'], $matches);
 
-                    if (isset($matches[0])) {
+                    if (isset($matches[0]))
+                    {
                         return true;
                     }
                 }
@@ -135,14 +145,17 @@ class twofactor_gauthenticator extends rcube_plugin
 
 
         $config_2FA = self::__get2FAconfig();
-        if (!($config_2FA['activate'] ?? false)) {
-            if ($rcmail->config->get('force_enrollment_users')) {
+        if (!($config_2FA['activate'] ?? false))
+        {
+            if ($rcmail->config->get('force_enrollment_users'))
+            {
                 $this->__goingRoundcubeTask('settings', 'plugin.twofactor_gauthenticator');
             }
             return;
         }
 
-        if ($this->__cookie($set = false) || !$this->__pluginAllowedByConfig()) {
+        if ($this->__cookie($set = false) || !$this->__pluginAllowedByConfig())
+        {
             $_SESSION['twofactor_gauthenticator_login'] -= 1; // so that we may use ge to check for valid session
             $this->__goingRoundcubeTask('mail');
             return;
@@ -165,22 +178,33 @@ class twofactor_gauthenticator extends rcube_plugin
         $rcmail = rcmail::get_instance();
         $config_2FA = self::__get2FAconfig();
 
-        if ($config_2FA['activate'] ?? false) {
+        if ($config_2FA['activate'] ?? false)
+        {
             // with IP allowed, we don't need to check anything
-            if ($rcmail->config->get('whitelist')) {
-                foreach ($rcmail->config->get('whitelist') as $ip_to_check) {
-                    if (isset($_SERVER['HTTP_CLIENT_IP']) && array_key_exists('HTTP_CLIENT_IP', $_SERVER)) {
+            if ($rcmail->config->get('whitelist'))
+            {
+                foreach ($rcmail->config->get('whitelist') as $ip_to_check)
+                {
+                    if (isset($_SERVER['HTTP_CLIENT_IP']) && array_key_exists('HTTP_CLIENT_IP', $_SERVER))
+                    {
                         $realip = $_SERVER['HTTP_CLIENT_IP'];
-                    } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER)) {
+                    }
+                    elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER))
+                    {
                         $realips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
                         $realips = array_map('trim', $realips);
                         $realip = $realips[0];
-                    } else {
+                    }
+                    else
+                    {
                         $realip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
                     }
-                    if (CIDR::match($realip, $ip_to_check)) {
-                        if (isset($_SESSION['twofactor_gauthenticator_login'])) {
-                            if ($rcmail->task === 'login') {
+                    if (CIDR::match($realip, $ip_to_check))
+                    {
+                        if (isset($_SESSION['twofactor_gauthenticator_login']))
+                        {
+                            if ($rcmail->task === 'login')
+                            {
                                 $this->__goingRoundcubeTask('mail');
                             }
                             return $p;
@@ -193,31 +217,41 @@ class twofactor_gauthenticator extends rcube_plugin
             $code = rcube_utils::get_input_value('_code_2FA', rcube_utils::INPUT_POST);
             $remember = rcube_utils::get_input_value('_remember_2FA', rcube_utils::INPUT_POST);
 
-            if ($code) {
-                if (self::__checkCode($code) || self::__isRecoveryCode($code)) {
-                    if (self::__isRecoveryCode($code)) {
+            if ($code)
+            {
+                if (self::__checkCode($code) || self::__isRecoveryCode($code))
+                {
+                    if (self::__isRecoveryCode($code))
+                    {
                         self::__consumeRecoveryCode($code);
                     }
 
-                    if (rcube_utils::get_input_value('_remember_2FA', rcube_utils::INPUT_POST) === 'yes') {
+                    if (rcube_utils::get_input_value('_remember_2FA', rcube_utils::INPUT_POST) === 'yes')
+                    {
                         $this->__cookie($set = true);
                     }
 
                     $this->__goingRoundcubeTask('mail');
-                } else {
-                    if ($rcmail->config->get('enable_fail_logs')) {
+                }
+                else
+                {
+                    if ($rcmail->config->get('enable_fail_logs'))
+                    {
                         $this->__logError();
                     }
                     $this->__exitSession();
                 }
             }
             // we're into some task but marked with login...
-            elseif ($rcmail->task !== 'login' && ! $_SESSION['twofactor_gauthenticator_2FA_login'] >= $_SESSION['twofactor_gauthenticator_login']) {
+            elseif ($rcmail->task !== 'login' && ! $_SESSION['twofactor_gauthenticator_2FA_login'] >= $_SESSION['twofactor_gauthenticator_login'])
+            {
                 $this->__exitSession();
             }
-
-        } elseif ($rcmail->config->get('force_enrollment_users') && ($rcmail->task !== 'settings' || $rcmail->action !== 'plugin.twofactor_gauthenticator')) {
-            if ($rcmail->task !== 'login') {	// resolve some redirection loop with logout
+        }
+        elseif ($rcmail->config->get('force_enrollment_users') && ($rcmail->task !== 'settings' || $rcmail->action !== 'plugin.twofactor_gauthenticator'))
+        {
+            if ($rcmail->task !== 'login')
+            {    // resolve some redirection loop with logout
                 $this->__goingRoundcubeTask('settings', 'plugin.twofactor_gauthenticator');
             }
         }
@@ -231,14 +265,18 @@ class twofactor_gauthenticator extends rcube_plugin
         $rcmail = rcmail::get_instance();
         $config_2FA = self::__get2FAconfig();
 
-        if (!($config_2FA['activate'] ?? false)
-            && $rcmail->config->get('force_enrollment_users') && $rcmail->task == 'settings' && $rcmail->action == 'plugin.twofactor_gauthenticator') {
+        if (
+            !($config_2FA['activate'] ?? false)
+            && $rcmail->config->get('force_enrollment_users') && $rcmail->task == 'settings' && $rcmail->action == 'plugin.twofactor_gauthenticator'
+        )
+        {
             // add overlay input box to html page
             $rcmail->output->add_footer(html::tag(
                 'form',
                 array(
                     'id' => 'enrollment_dialog',
-                    'method' => 'post'),
+                    'method' => 'post'
+                ),
                 html::tag('h3', null, $this->gettext('enrollment_dialog_title')) .
                     $this->gettext('enrollment_dialog_msg')
             ));
@@ -268,7 +306,8 @@ class twofactor_gauthenticator extends rcube_plugin
         $rcmail = rcmail::get_instance();
 
         // Verify user is authenticated before allowing changes (by Stephen K. Gielda <security@codamail.com>)
-        if (!$rcmail->user->ID) {
+        if (!$rcmail->user->ID)
+        {
             header('Location: ?_task=login');
             exit;
         }
@@ -278,7 +317,8 @@ class twofactor_gauthenticator extends rcube_plugin
         //
         // Solution: if user don't have session created by any rendered page, we kick out
         $config_2FA = self::__get2FAconfig();
-        if (!$_SESSION['twofactor_gauthenticator_2FA_login'] && $config_2FA['activate']) {
+        if (!$_SESSION['twofactor_gauthenticator_2FA_login'] && $config_2FA['activate'])
+        {
             $this->__exitSession();
         }
 
@@ -324,21 +364,34 @@ class twofactor_gauthenticator extends rcube_plugin
 
         // Activate/deactivate
         $field_id = '2FA_activate';
-        $checkbox_activate = new html_checkbox(array('name' => $field_id, 'id' => $field_id, 'type' => 'checkbox'));
+        $checkbox_activate = new html_checkbox(array('name' => $field_id, 'id' => $field_id, 'type' => 'checkbox', 'class' => 'ml-3 '));
         $table->add('title', html::label($field_id, rcube::Q($this->gettext('activate'))));
         $checked = (isset($data['activate']) && $data['activate']) ? null : 1; // :-?
-        $table->add(null, $checkbox_activate->show($checked));
+
+
+        // button to setup all fields if doesn't exists secret
+        $html_setup_all_fields = '';
+        if (empty($data['secret']))
+        {
+            $html_setup_all_fields = ' / <input type="button" class="button mainaction ml-3 mb-3" id="2FA_setup_fields" value="' . $this->gettext('setup_all_fields') . '"> ';
+        }
+
+        $table->add(null, $checkbox_activate->show($checked) . " " . $html_setup_all_fields);
 
 
         // secret
         $field_id = '2FA_secret';
-        $input_descsecret = new html_inputfield(array('name' => $field_id, 'id' => $field_id, 'size' => 60, 'type' => 'password', 'value' => $data['secret'] ?? '', 'autocomplete' => 'new-password'));
+        $input_descsecret = new html_inputfield(array('name' => $field_id, 'id' => $field_id, 'size' => 60, 'type' => 'password', 'value' => $data['secret'] ?? '', 'autocomplete' => 'new-password', 'class' => 'form-control mb-2'));
         $table->add('title', html::label($field_id, rcube::Q($this->gettext('secret'))));
-        $html_secret = $input_descsecret->show();
-        if ($data['secret'] ?? '') {
-            $html_secret .= ' &nbsp; <input type="button" class="button mainaction" id="2FA_change_secret" value="'.$this->gettext('show_secret').'">';
-        } else {
-            $html_secret .= ' &nbsp; <input type="button" class="button mainaction" id="2FA_create_secret" disabled="disabled" value="'.$this->gettext('create_secret').'">';
+        $html_secret = '<div class="row">';
+        $html_secret .= '<div class="col-md-4">' . $input_descsecret->show() . '</div>';
+        if ($data['secret'] ?? '')
+        {
+            $html_secret .= ' <div class="col-md-2"> <input type="button" class="button mainaction ml-2" id="2FA_change_secret" value="' . $this->gettext('show_secret') . '"></div>';
+        }
+        else
+        {
+            $html_secret .= ' <div class="col-md-2"> <input type="button" class="button mainaction btn-block" id="2FA_create_secret" disabled="disabled" value="' . $this->gettext('create_secret') . '"></div>';
         }
         $table->add(null, $html_secret);
 
@@ -346,24 +399,30 @@ class twofactor_gauthenticator extends rcube_plugin
         // recovery codes
         $table->add('title', $this->gettext('recovery_codes'));
 
-        $html_recovery_codes = '';
+        $html_recovery_codes = '<div class="row">';
         $i = 0;
-        for ($i = 0; $i < $this->_number_recovery_codes; $i++) {
+        for ($i = 0; $i < $this->_number_recovery_codes; $i++)
+        {
             $value = isset($data['recovery_codes'][$i]) ? $data['recovery_codes'][$i] : '';
-            $html_recovery_codes .= ' <input type="password" name="2FA_recovery_codes[]" value="'.$value.'" maxlength="10"> &nbsp; ';
+            $html_recovery_codes .= '<div class="col-md-2"><input type="password" name="2FA_recovery_codes[]" value="' . $value . '" maxlength="10" class="form-control mb-2"></div> ';
         }
-        if ($data['secret'] ?? '') {
-            $html_recovery_codes .= '<input type="button" class="button mainaction" id="2FA_show_recovery_codes" value="'.$this->gettext('show_recovery_codes').'">';
-        } else {
-            $html_recovery_codes .= '<input type="button" class="button mainaction" id="2FA_show_recovery_codes" disabled="disabled" value="'.$this->gettext('show_recovery_codes').'">';
+        if ($data['secret'] ?? '')
+        {
+            $html_recovery_codes .= '<div class="col-md-2"><input type="button" class="button mainaction" id="2FA_show_recovery_codes" value="' . $this->gettext('show_recovery_codes') . '"></div>';
         }
+        else
+        {
+            $html_recovery_codes .= '<div class="col-md-2"><input type="button" class="button mainaction" id="2FA_show_recovery_codes" disabled="disabled" value="' . $this->gettext('show_recovery_codes') . '"></div>';
+        }
+        $html_recovery_codes .= '</div>';
         $table->add(null, $html_recovery_codes);
 
 
         // qr-code
-        if ($data['secret'] ?? '') {
+        if ($data['secret'] ?? '')
+        {
             $table->add('title', $this->gettext('qr_code'));
-            $table->add(null, '<input type="button" class="button mainaction" id="2FA_change_qr_code" value="'.$this->gettext('show_qr_code').'"> 
+            $table->add(null, '<input type="button" class="button mainaction" id="2FA_change_qr_code" value="' . $this->gettext('show_qr_code') . '">
         						<div id="2FA_qr_code" style="display: none; margin-top: 10px;"></div>');
 
             // new JS qr-code, without call to Google
@@ -371,43 +430,44 @@ class twofactor_gauthenticator extends rcube_plugin
         }
 
         // infor
-        $table->add(null, '<td><br>'.$this->gettext('msg_infor').'</td>');
+        // $table->add(null, '<td><div class="pl-3">' . $this->gettext('msg_infor') . '</di></td>');
+        $msg_infor = '<div class="p-3">' . $this->gettext('msg_infor') . '</div>';
 
-        // button to setup all fields if doesn't exists secret
-        $html_setup_all_fields = '';
-        if (empty($data['secret'])) {
-            $html_setup_all_fields = '<input type="button" class="button mainaction" id="2FA_setup_fields" value="'.$this->gettext('setup_all_fields').'">';
-        }
 
-        $html_check_code = '<br /><br /><input type="button" class="button mainaction" id="2FA_check_code" value="'.$this->gettext('check_code').'"> &nbsp;&nbsp; <input type="text" id="2FA_code_to_check" maxlength="10">';
+        $html_check_code = '<br /><div class="row"><div class="col-md-2"> <input type="text" id="2FA_code_to_check" maxlength="10" class="form-control" placeholder="000000"></div><div class="col-md-3"><input type="button" class="button mainaction btn-block" id="2FA_check_code" value="' . $this->gettext('check_code') . '"></div></div>';
 
-        $html_help_code = '<br /><br /> &#9432; '.$this->gettext('msg_help');
+        $html_save_button = '<br />' . $rcmail->output->button(array(
+            'command' => 'plugin.twofactor_gauthenticator-save',
+            'type' => 'input',
+            'class' => 'button mainaction ml-3 btn-save',
+            'label' => 'save'
+        ));
+
+        $html_help_code = '<hr /> &#9432; ' . $this->gettext('msg_help');
 
         // Build the table with the divs around it
         $out = html::div(
             array('class' => 'settingsbox'),
             html::tag('h3', array('id' => 'prefs-title', 'class' => ''), $this->gettext('twofactor_gauthenticator') . ' - ' . $rcmail->user->data['username']) .
-            html::div(
-                array('class' => 'boxcontent'),
-                $table->show() .
-                html::p(
-                    null,
-                    $rcmail->output->button(array(
-                        'command' => 'plugin.twofactor_gauthenticator-save',
-                        'type' => 'input',
-                        'class' => 'button mainaction',
-                        'label' => 'save'
-                    ))
+                html::div(
+                    array('class' => 'boxcontent'),
+                    $table->show() .
+                        html::p(
+                            null,
+                            // button show/hide secret
+                            //.'<input type="button" class="button mainaction" id="2FA_change_secret" value="'.$this->gettext('show_secret').'">'
 
-                    // button show/hide secret
-                    //.'<input type="button" class="button mainaction" id="2FA_change_secret" value="'.$this->gettext('show_secret').'">'
+                            // button to setup all fields
 
-                    // button to setup all fields
-                    .$html_setup_all_fields
-                    .$html_check_code
-                    .$html_help_code
+                            $msg_infor
+                                // . $html_setup_all_fields
+                                . $html_check_code
+
+                                . $html_save_button
+
+                                . $html_help_code
+                        )
                 )
-            )
         );
 
         // Construct the form
@@ -420,7 +480,7 @@ class twofactor_gauthenticator extends rcube_plugin
             'action' => './?_task=settings&_action=plugin.twofactor_gauthenticator-save',
         ), $out);
 
-        $out = "<div class='formcontainer'><div class='formcontent'>".$out."</div></div>";
+        $out = "<div class='formcontainer'><div class='formcontent'>" . $out . "</div></div>";
 
         return $out;
     }
@@ -432,9 +492,12 @@ class twofactor_gauthenticator extends rcube_plugin
         //$secret = rcube_utils::get_input_value('secret', rcube_utils::INPUT_GET);
         $secret = rcube_utils::get_input_value('secret', rcube_utils::INPUT_GET);
 
-        if (self::__checkCode($code, $secret)) {
+        if (self::__checkCode($code, $secret))
+        {
             echo $this->gettext('code_ok');
-        } else {
+        }
+        else
+        {
             echo $this->gettext('code_ko');
         }
         exit;
@@ -447,7 +510,7 @@ class twofactor_gauthenticator extends rcube_plugin
     {
 
         $_SESSION['twofactor_gauthenticator_2FA_login'] = time();
-        header('Location: ?_task='.$task . ($action ? '&_action='.$action : ''));
+        header('Location: ?_task=' . $task . ($action ? '&_action=' . $action : ''));
         exit;
     }
 
@@ -457,7 +520,7 @@ class twofactor_gauthenticator extends rcube_plugin
         unset($_SESSION['twofactor_gauthenticator_2FA_login']);
 
         $rcmail = rcmail::get_instance();
-        header('Location: ?_task=logout&_token='.$rcmail->get_request_token());
+        header('Location: ?_task=logout&_token=' . $rcmail->get_request_token());
         exit;
     }
 
@@ -474,7 +537,7 @@ class twofactor_gauthenticator extends rcube_plugin
             $cdata = json_decode($rcmail->decrypt($data));
             if ($cdata == null)
             {
-                rcube::write_log('twofactor_gauthenticator',"WARN: Broken 2FA!, clearing...");
+                rcube::write_log('twofactor_gauthenticator', "WARN: Broken 2FA!, clearing...");
                 $cdata = array();
             }
             $data = (array)$cdata;
@@ -489,7 +552,8 @@ class twofactor_gauthenticator extends rcube_plugin
         $user = $rcmail->user;
 
         $arr_prefs = $user->get_prefs();
-        if ($data['activate'] != true) {
+        if ($data['activate'] != true)
+        {
             // if deactivated, remove all data (secret was still generated and couldn't be removed)
             $data = array();
         }
@@ -497,10 +561,10 @@ class twofactor_gauthenticator extends rcube_plugin
         if ($data && $rcmail->config->get('twofactor_pref_encrypt'))
         {
             $edata = $rcmail->encrypt(json_encode($data));
-            $data = $edata != null ? $edata: $data;
+            $data = $edata != null ? $edata : $data;
         }
         $arr_prefs['twofactor_gauthenticator'] = $data;
-        rcube::write_log('twofactor_gauthenticator',"WARN: 2FA may have changed!");
+        rcube::write_log('twofactor_gauthenticator', "WARN: 2FA may have changed!");
         return $user->save_prefs($arr_prefs);
     }
 
@@ -562,34 +626,43 @@ class twofactor_gauthenticator extends rcube_plugin
         $iv = hash_hmac('md5', implode("\3\2\3", array($rcmail->user->data['username'], $this->__getSecret())), $rcmail->config->get('des_key'), true);
         $name = hash_hmac('md5', $rcmail->user->data['username'], $rcmail->config->get('des_key'));
 
-        if ($set) {
+        if ($set)
+        {
             $expires = time() + 2592000; // 30 days from now
             $rand = mt_rand();
             $signature = hash_hmac('sha512', implode("\1\0\1", array($rcmail->user->data['username'], $this->__getSecret(), $user_agent, $rand, $expires)), $rcmail->config->get('des_key'), true);
             $plain_content = sprintf("%d:%d:%s", $expires, $rand, $signature);
             $encrypted_content = openssl_encrypt($plain_content, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
-            if ($encrypted_content !== false) {
+            if ($encrypted_content !== false)
+            {
                 $b64_encrypted_content = strtr(base64_encode($encrypted_content), '+/=', '-_,');
                 rcube_utils::setcookie($name, $b64_encrypted_content, $expires);
                 return true;
             }
             return false;
-        } else {
+        }
+        else
+        {
             $b64_encrypted_content = filter_input(INPUT_COOKIE, $name, FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => '/[a-zA-Z0-9_-]+,{0,3}/')));
-            if (is_string($b64_encrypted_content) && !empty($b64_encrypted_content) && strlen($b64_encrypted_content) % 4 === 0) {
+            if (is_string($b64_encrypted_content) && !empty($b64_encrypted_content) && strlen($b64_encrypted_content) % 4 === 0)
+            {
                 $encrypted_content = base64_decode(strtr($b64_encrypted_content, '-_,', '+/='), true);
-                if ($encrypted_content !== false) {
+                if ($encrypted_content !== false)
+                {
                     $plain_content = openssl_decrypt($encrypted_content, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
-                    if ($plain_content !== false) {
+                    if ($plain_content !== false)
+                    {
                         $now = time();
                         list($expires, $rand, $signature) = explode(':', $plain_content, 3);
-                        if ($expires > $now && ($expires - $now) <= 2592000) {
+                        if ($expires > $now && ($expires - $now) <= 2592000)
+                        {
                             $signature_verification = hash_hmac('sha512', implode("\1\0\1", array($rcmail->user->data['username'], $this->__getSecret(), $user_agent, $rand, $expires)), $rcmail->config->get('des_key'), true);
                             // constant time
                             $cmp = strlen($signature) ^ strlen($signature_verification);
                             $signature = $signature ^ $signature_verification;
-                            for ($i = 0; $i < strlen($signature); $i++) {
-                                $cmp += ord($signature [$i]);
+                            for ($i = 0; $i < strlen($signature); $i++)
+                            {
+                                $cmp += ord($signature[$i]);
                             }
                             return ($cmp === 0);
                         }
@@ -605,6 +678,6 @@ class twofactor_gauthenticator extends rcube_plugin
     // log error into $_logs_file directory
     private function __logError()
     {
-        rcube::write_log('twofactor_gauthenticator', "ERROR: 2FA fail - rip:". $_SERVER['HTTP_X_FORWARDED_FOR']." lip:".$_SERVER['REMOTE_ADDR']);
+        rcube::write_log('twofactor_gauthenticator', "ERROR: 2FA fail - rip:" . $_SERVER['HTTP_X_FORWARDED_FOR'] . " lip:" . $_SERVER['REMOTE_ADDR']);
     }
 }
