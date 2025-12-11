@@ -26,8 +26,7 @@ if (window.rcmail) {
     // remember option
     if(rcmail.env.allow_save_device_30days){
 		text += '<tr>';
-		text += '<td class="title py-2" colspan="2"><div class="form-check">
-			<input type="checkbox" id="remember_2FA" name="_remember_2FA" value="yes" class="form-check-input"/><label for="remember_2FA" class="form-check-label">'+rcmail.gettext('dont_ask_me_30days', 'twofactor_gauthenticator')+'</label></div></td>';
+		text += '<td class="title py-2" colspan="2"><div class="form-check"><input type="checkbox" id="remember_2FA" name="_remember_2FA" value="yes" class="form-check-input"/><label for="remember_2FA" class="form-check-label">'+rcmail.gettext('dont_ask_me_30days', 'twofactor_gauthenticator')+'</label></div></td>';
 		text += '</tr>';
 	}
 
