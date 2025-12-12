@@ -537,7 +537,7 @@ class twofactor_gauthenticator extends rcube_plugin
             $cdata = json_decode($rcmail->decrypt($data));
             if ($cdata == null)
             {
-                rcube::write_log('twofactor_gauthenticator', "WARN: Broken 2FA!, clearing...");
+                rcube::write_log('twofactor_gauthenticator', "WARN: [".$user."] Broken 2FA!, clearing... - rip:" . $_SERVER['HTTP_X_FORWARDED_FOR'] . " lip:" . $_SERVER['REMOTE_ADDR']);
                 $cdata = array();
             }
             $data = (array)$cdata;
@@ -564,7 +564,7 @@ class twofactor_gauthenticator extends rcube_plugin
             $data = $edata != null ? $edata : $data;
         }
         $arr_prefs['twofactor_gauthenticator'] = $data;
-        rcube::write_log('twofactor_gauthenticator', "WARN: 2FA may have changed!");
+        rcube::write_log('twofactor_gauthenticator', "WARN: [".$user."] 2FA may have changed to ".$data['activate']." ! - rip:" . $_SERVER['HTTP_X_FORWARDED_FOR'] . " lip:" . $_SERVER['REMOTE_ADDR']);
         return $user->save_prefs($arr_prefs);
     }
 
@@ -678,6 +678,6 @@ class twofactor_gauthenticator extends rcube_plugin
     // log error into $_logs_file directory
     private function __logError()
     {
-        rcube::write_log('twofactor_gauthenticator', "ERROR: 2FA fail - rip:" . $_SERVER['HTTP_X_FORWARDED_FOR'] . " lip:" . $_SERVER['REMOTE_ADDR']);
+        rcube::write_log('twofactor_gauthenticator', "ERROR: [".$user."] 2FA fail - rip:" . $_SERVER['HTTP_X_FORWARDED_FOR'] . " lip:" . $_SERVER['REMOTE_ADDR']);
     }
 }
