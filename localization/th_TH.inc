@@ -23,7 +23,7 @@ $labels['hide_qr_code'] = 'ซ่อนคิวอาร์โค้ด';
 $labels['recovery_codes'] = 'รหัสกู้คืน';
 $labels['show_recovery_codes'] = 'แสดงรหัสกู้คืน';
 $labels['hide_recovery_codes'] = 'ซ่อนรหัสกู้คืน';
-$labels['setup_all_fields'] = 'กรอกข้อมูลให้ครบทุกช่อง (อย่าลืมกดบันทึกเพื่อจัดเก็บการตั้งค่าของคุณ)';
+$labels['setup_all_fields'] = 'กรอกข้อมูลให้โดยอัตโนมัติ (อย่าลืมกดบันทึกเพื่อจัดเก็บการตั้งค่าของคุณ)';
 $labels['enrollment_dialog_title'] = 'ลงทะเบียนการยืนยันตัวตนแบบสองขั้นตอน';
 $labels['enrollment_dialog_msg'] = '<strong>การยืนยันตัวตนแบบสองขั้นตอน</strong> จำเป็นเพื่อเพิ่มความปลอดภัย โปรดตั้งค่าตอนนี้';
 
