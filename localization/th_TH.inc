@@ -14,7 +14,7 @@ $labels['msg_infor'] = 'คุณสามารถสแกนคิวอา�
   , <b>Google Authenticator</b> ( <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank">Play Store</a> | <a href="https://apps.apple.com/us/app/google-authenticator/id388497605" target="_blank">App Store</a> )
   , <b>Microsoft Authenticator</b> ( <a href="https://play.google.com/store/apps/details?id=com.azure.authenticator" target="_blank">Play Store</a> | <a href="https://apps.apple.com/us/app/microsoft-authenticator/id983156458" target="_blank">App Store</a> )
 ';
-$labels['msg_help'] = '<a href="https://github.com/alexandregz/twofactor_gauthenticat...ster?tab=readme-ov-file#usage" target="_blank">คู่มือการใช้งาน</a>';
+$labels['msg_help'] = '<a href="https://github.com/alexandregz/twofactor_gauthenticator/tree/master?tab=readme-ov-file#usage" target="_blank">User manual</a>';
 $labels['show_secret'] = 'แสดงรหัสลับ';
 $labels['hide_secret'] = 'ซ่อนรหัสลับ';
 $labels['create_secret'] = 'สร้างรหัสลับ';
